@@ -9,6 +9,12 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { UnlockFRP } from "@/components/UnlockFRP";
 import { OrderHistory } from "@/components/OrderHistory";
 import { AddFunds } from "@/components/AddFunds";
+import { CheckiCloud } from "@/components/CheckiCloud";
+import { CheckSamsungKG } from "@/components/CheckSamsungKG";
+import { CheckSamsungInfo } from "@/components/CheckSamsungInfo";
+import { CheckMiCloud } from "@/components/CheckMiCloud";
+import { InvoiceHistory } from "@/components/InvoiceHistory";
+import { UnsupportedModels } from "@/components/UnsupportedModels";
 import { useGSMServices } from "@/hooks/useGSMServices";
 import { 
   Shield, 
@@ -18,7 +24,13 @@ import {
   Smartphone,
   Server,
   Wallet,
-  Settings
+  Settings,
+  MessageCircle,
+  FileText,
+  Radio,
+  Bell,
+  Users,
+  Mail
 } from "lucide-react";
 
 export const Dashboard = () => {
@@ -64,10 +76,162 @@ export const Dashboard = () => {
         return <OrderHistory />;
       case "add-fund":
         return <AddFunds />;
+      case "check-icloud":
+        return <CheckiCloud />;
+      case "check-samsung-kg":
+        return <CheckSamsungKG />;
+      case "check-samsung-info":
+        return <CheckSamsungInfo />;
+      case "check-micloud":
+        return <CheckMiCloud />;
+      case "invoice":
+        return <InvoiceHistory />;
+      case "unsupported":
+        return <UnsupportedModels />;
+      case "contact":
+        return renderContactSupport();
+      case "statement":
+        return renderStatement();
+      case "channel":
+        return renderChannel();
       default:
         return renderDashboard();
     }
   };
+
+  const renderContactSupport = () => (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 rounded-full bg-primary/10">
+          <MessageCircle className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">Contact Support</h2>
+          <p className="text-muted-foreground">Get help with your orders and technical issues</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Support Channels</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-3 p-3 border rounded-lg">
+              <MessageCircle className="w-5 h-5 text-primary" />
+              <div>
+                <h4 className="font-medium">Live Chat</h4>
+                <p className="text-sm text-muted-foreground">Available 24/7</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3 p-3 border rounded-lg">
+              <Mail className="w-5 h-5 text-primary" />
+              <div>
+                <h4 className="font-medium">Email Support</h4>
+                <p className="text-sm text-muted-foreground">support@frpimei.com</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Common Issues</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button variant="ghost" className="w-full justify-start">Order taking too long?</Button>
+            <Button variant="ghost" className="w-full justify-start">Payment not processed?</Button>
+            <Button variant="ghost" className="w-full justify-start">Device not supported?</Button>
+            <Button variant="ghost" className="w-full justify-start">Technical questions?</Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderStatement = () => (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 rounded-full bg-primary/10">
+          <FileText className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">Account Statement</h2>
+          <p className="text-muted-foreground">View your account activity and transaction history</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-success">${userStats.balance.toFixed(2)}</div>
+              <div className="text-xs text-muted-foreground">Current Balance</div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{userStats.lastOrder}</div>
+              <div className="text-xs text-muted-foreground">Total Orders</div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{userStats.success}</div>
+              <div className="text-xs text-muted-foreground">Completed</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderChannel = () => (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 rounded-full bg-primary/10">
+          <Radio className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">Communication Channels</h2>
+          <p className="text-muted-foreground">Stay connected with our community and updates</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Official Channels</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button variant="outline" className="w-full justify-start">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Telegram Channel
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Radio className="w-4 h-4 mr-2" />
+              Discord Server
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Bell className="w-4 h-4 mr-2" />
+              News & Updates
+            </Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Community</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center py-4">
+              <Users className="w-12 h-12 text-muted-foreground/50 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Join our community for tips, updates, and support</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 
   const renderDashboard = () => (
     <>
@@ -228,6 +392,15 @@ export const Dashboard = () => {
                    selectedSection === "unlock-frp" ? "UNLOCK FRP" :
                    selectedSection === "history" ? "ORDER HISTORY" :
                    selectedSection === "add-fund" ? "ADD FUNDS" :
+                   selectedSection === "check-icloud" ? "CHECK ICLOUD" :
+                   selectedSection === "check-samsung-kg" ? "SAMSUNG KG CHECK" :
+                   selectedSection === "check-samsung-info" ? "SAMSUNG INFO" :
+                   selectedSection === "check-micloud" ? "MICLOUD CHECK" :
+                   selectedSection === "invoice" ? "INVOICE HISTORY" :
+                   selectedSection === "statement" ? "ACCOUNT STATEMENT" :
+                   selectedSection === "unsupported" ? "UNSUPPORTED MODELS" :
+                   selectedSection === "contact" ? "CONTACT SUPPORT" :
+                   selectedSection === "channel" ? "CHANNELS" :
                    selectedSection.toUpperCase().replace("-", " ")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
