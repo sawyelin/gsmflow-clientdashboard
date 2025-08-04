@@ -44,7 +44,7 @@ export const AddFunds = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Current Balance */}
         <Card className="lg:col-span-1">
           <CardHeader>
@@ -88,7 +88,7 @@ export const AddFunds = () => {
             {/* Quick Amount Selection */}
             <div className="space-y-3">
               <Label>Quick Amounts</Label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {quickAmounts.map((amount) => (
                   <Button
                     key={amount}

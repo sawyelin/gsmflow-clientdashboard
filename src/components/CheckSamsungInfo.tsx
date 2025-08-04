@@ -101,7 +101,7 @@ export const CheckSamsungInfo = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Check Form */}
         <Card>
           <CardHeader>
@@ -166,7 +166,7 @@ export const CheckSamsungInfo = () => {
           <CardContent>
             {result ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div>
                       <span className="text-xs text-muted-foreground uppercase tracking-wide">Model</span>
@@ -240,7 +240,7 @@ export const CheckSamsungInfo = () => {
 
       {/* Quick Stats */}
       {result && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-4">
               <div className="text-center">

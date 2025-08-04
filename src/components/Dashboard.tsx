@@ -1,105 +1,88 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Sidebar } from "@/components/Sidebar";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { UnlockFRP } from "@/components/UnlockFRP";
-import { OrderHistory } from "@/components/OrderHistory";
-import { AddFunds } from "@/components/AddFunds";
-import { CheckiCloud } from "@/components/CheckiCloud";
-import { CheckSamsungKG } from "@/components/CheckSamsungKG";
-import { CheckSamsungInfo } from "@/components/CheckSamsungInfo";
-import { CheckMiCloud } from "@/components/CheckMiCloud";
-import { InvoiceHistory } from "@/components/InvoiceHistory";
-import { UnsupportedModels } from "@/components/UnsupportedModels";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeToggle } from "./ThemeToggle";
+import { AppSidebar, MobileSidebar } from "./Sidebar";
+import { UnlockFRP } from "./UnlockFRP";
+import { OrderHistory } from "./OrderHistory";
+import { CheckiCloud } from "./CheckiCloud";
+import { CheckSamsungKG } from "./CheckSamsungKG";
+import { CheckSamsungInfo } from "./CheckSamsungInfo";
+import { CheckMiCloud } from "./CheckMiCloud";
+import { InvoiceHistory } from "./InvoiceHistory";
+import { AddFunds } from "./AddFunds";
+import { UnsupportedModels } from "./UnsupportedModels";
 import { useGSMServices } from "@/hooks/useGSMServices";
 import { 
-  Shield, 
-  CheckCircle2, 
-  XCircle, 
-  Clock,
   Smartphone,
   Server,
-  Wallet,
-  Settings,
-  MessageCircle,
-  FileText,
-  Radio,
-  Bell,
+  Clock,
+  CheckCircle,
+  DollarSign,
+  TrendingUp,
   Users,
-  Mail
+  Activity,
+  MessageCircle,
+  Radio,
+  Settings,
+  FileText,
+  Bell
 } from "lucide-react";
 
 export const Dashboard = () => {
-  const [selectedSection, setSelectedSection] = useState("dashboard");
-  const { stats: userStats, orders, isServerOnline } = useGSMServices();
+  const [selectedSection, setSelectedSection] = useState("unlock-frp");
+  const { addFunds, orders, stats: userStats, isLoading } = useGSMServices();
+  const isMobile = useIsMobile();
 
-  const stats = [
-    {
-      title: "Verification",
-      value: userStats.verification.toString(),
-      percentage: `${((userStats.verification / Math.max(userStats.lastOrder, 1)) * 100).toFixed(1)}%`,
-      icon: Shield,
-      variant: "warning" as const
-    },
-    {
-      title: "Success",
-      value: userStats.success.toString(), 
-      percentage: `${((userStats.success / Math.max(userStats.lastOrder, 1)) * 100).toFixed(1)}%`,
-      icon: CheckCircle2,
-      variant: "success" as const
-    },
-    {
-      title: "Rejected",
-      value: userStats.rejected.toString(),
-      percentage: `${((userStats.rejected / Math.max(userStats.lastOrder, 1)) * 100).toFixed(1)}%`, 
-      icon: XCircle,
-      variant: "destructive" as const
-    },
-    {
-      title: "Last Order",
-      value: userStats.lastOrder.toString(),
-      percentage: `${userStats.lastOrder > 0 ? '+' : ''}${userStats.lastOrder}`,
-      icon: Clock,
-      variant: "default" as const
-    }
+  const dashboardStats = [
+    { title: "Total Orders", value: "156", icon: Smartphone, percentage: "+20.1% from last month" },
+    { title: "Success Rate", value: "98.5%", icon: CheckCircle, percentage: "+0.5% from last month" },
+    { title: "Active Services", value: "12", icon: Server, percentage: "All systems operational" },
+    { title: "Revenue", value: "$2,450", icon: DollarSign, percentage: "+15% from last month" }
   ];
 
-  const renderContent = () => {
-    switch (selectedSection) {
-      case "unlock-frp":
-        return <UnlockFRP onOrderCreated={() => setSelectedSection("history")} />;
-      case "history":
-        return <OrderHistory />;
-      case "add-fund":
-        return <AddFunds />;
-      case "check-icloud":
-        return <CheckiCloud />;
-      case "check-samsung-kg":
-        return <CheckSamsungKG />;
-      case "check-samsung-info":
-        return <CheckSamsungInfo />;
-      case "check-micloud":
-        return <CheckMiCloud />;
-      case "invoice":
-        return <InvoiceHistory />;
-      case "unsupported":
-        return <UnsupportedModels />;
-      case "contact":
-        return renderContactSupport();
-      case "statement":
-        return renderStatement();
-      case "channel":
-        return renderChannel();
-      default:
-        return renderDashboard();
+  const getSectionTitle = (section: string) => {
+    switch (section) {
+      case "unlock-frp": return "FRP Unlock Service";
+      case "history": return "Order History";
+      case "check-icloud": return "iCloud Status Checker";
+      case "check-samsung-kg": return "Samsung KG Checker";
+      case "check-samsung-info": return "Samsung Info Checker";
+      case "check-micloud": return "MiCloud Checker";
+      case "invoice": return "Invoices";
+      case "statement": return "Account Statement";
+      case "add-fund": return "Add Funds";
+      case "unsupported": return "Unsupported Models";
+      case "contact": return "Contact Support";
+      case "channel": return "Communication Channels";
+      default: return "Dashboard";
     }
   };
 
-  const renderContactSupport = () => (
+  const getSectionDescription = (section: string) => {
+    switch (section) {
+      case "unlock-frp": return "Professional FRP bypass service for Android devices";
+      case "history": return "View and track all your service orders";
+      case "check-icloud": return "Check iCloud activation lock status";
+      case "check-samsung-kg": return "Samsung Knox Guard status verification";
+      case "check-samsung-info": return "Detailed Samsung device information";
+      case "check-micloud": return "Xiaomi Mi Account status checker";
+      case "invoice": return "Download invoices and receipts";
+      case "statement": return "View your account activity and balance";
+      case "add-fund": return "Add credits to your account";
+      case "unsupported": return "List of unsupported device models";
+      case "contact": return "Get help from our support team";
+      case "channel": return "Join our community and get updates";
+      default: return "Professional IMEI services dashboard";
+    }
+  };
+
+  const renderContact = () => (
     <div className="space-y-6">
       <div className="flex items-center space-x-3">
         <div className="p-2 rounded-full bg-primary/10">
@@ -107,79 +90,47 @@ export const Dashboard = () => {
         </div>
         <div>
           <h2 className="text-2xl font-bold">Contact Support</h2>
-          <p className="text-muted-foreground">Get help with your orders and technical issues</p>
+          <p className="text-muted-foreground">Get help from our professional support team</p>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Support Channels</CardTitle>
+            <CardDescription>Choose your preferred way to reach us</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center space-x-3 p-3 border rounded-lg">
-              <MessageCircle className="w-5 h-5 text-primary" />
-              <div>
-                <h4 className="font-medium">Live Chat</h4>
-                <p className="text-sm text-muted-foreground">Available 24/7</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3 p-3 border rounded-lg">
-              <Mail className="w-5 h-5 text-primary" />
-              <div>
-                <h4 className="font-medium">Email Support</h4>
-                <p className="text-sm text-muted-foreground">support@frpimei.com</p>
-              </div>
-            </div>
+            <Button variant="outline" className="w-full justify-start">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Live Chat
+              <Badge variant="secondary" className="ml-auto">Online</Badge>
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <FileText className="w-4 h-4 mr-2" />
+              Support Ticket
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Telegram Support
+            </Button>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Common Issues</CardTitle>
+            <CardTitle>Response Times</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Button variant="ghost" className="w-full justify-start">Order taking too long?</Button>
-            <Button variant="ghost" className="w-full justify-start">Payment not processed?</Button>
-            <Button variant="ghost" className="w-full justify-start">Device not supported?</Button>
-            <Button variant="ghost" className="w-full justify-start">Technical questions?</Button>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-
-  const renderStatement = () => (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-3">
-        <div className="p-2 rounded-full bg-primary/10">
-          <FileText className="w-6 h-6 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold">Account Statement</h2>
-          <p className="text-muted-foreground">View your account activity and transaction history</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-success">${userStats.balance.toFixed(2)}</div>
-              <div className="text-xs text-muted-foreground">Current Balance</div>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Live Chat</span>
+              <Badge variant="secondary">~2 mins</Badge>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{userStats.lastOrder}</div>
-              <div className="text-xs text-muted-foreground">Total Orders</div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Support Ticket</span>
+              <Badge variant="secondary">~1 hour</Badge>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{userStats.success}</div>
-              <div className="text-xs text-muted-foreground">Completed</div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm">Telegram</span>
+              <Badge variant="secondary">~5 mins</Badge>
             </div>
           </CardContent>
         </Card>
@@ -236,8 +187,8 @@ export const Dashboard = () => {
   const renderDashboard = () => (
     <>
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {dashboardStats.map((stat, index) => (
           <Card key={index} className="relative overflow-hidden hover-scale fade-in hover-glow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
@@ -252,173 +203,240 @@ export const Dashboard = () => {
         ))}
       </div>
 
-      {/* Server Status and Balance */}
+      <Separator />
+
+      {/* Server Status & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Server Status */}
-        <Card className={`${isServerOnline ? 'border-success/50' : 'border-destructive/50'} hover-scale fade-in relative overflow-hidden`}>
-          <CardContent className="p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Server className="w-5 h-5" />
+              <span>Server Status</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-full ${isServerOnline ? 'bg-success/10' : 'bg-destructive/10'}`}>
-                  <Server className={`w-6 h-6 ${isServerOnline ? 'text-success' : 'text-destructive'}`} />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Server Status</h3>
-                  <Badge 
-                    variant={isServerOnline ? "default" : "destructive"} 
-                    className={isServerOnline ? "bg-success text-success-foreground" : "animate-pulse"}
-                  >
-                    {isServerOnline ? "Online" : "Offline"}
-                  </Badge>
-                </div>
+              <span className="text-sm">API Server</span>
+              <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                Online
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Database</span>
+              <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                Healthy
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Response Time</span>
+              <Badge variant="secondary">~45ms</Badge>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>System Load</span>
+                <span>34%</span>
               </div>
-              {isServerOnline ? (
-                <CheckCircle2 className="w-6 h-6 text-success" />
-              ) : (
-                <XCircle className="w-6 h-6 text-destructive" />
-              )}
+              <Progress value={34} className="h-2" />
             </div>
           </CardContent>
-          <div className={`absolute top-0 right-0 w-32 h-32 ${isServerOnline ? 'bg-success/5' : 'bg-destructive/5'} rounded-full blur-3xl`} />
         </Card>
 
-        {/* Balance Card */}
-        <Card className="bg-gradient-warning border-warning/50 hover-scale fade-in relative overflow-hidden shadow-elegant">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-full bg-warning-foreground/10">
-                  <Wallet className="w-6 h-6 text-warning-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-warning-foreground tracking-wider">BALANCE</h3>
-                  <div className="text-3xl font-bold text-warning-foreground">${userStats.balance.toFixed(2)}</div>
-                </div>
-              </div>
-              <div className="relative">
-                <Wallet className="w-8 h-8 text-warning-foreground/30" />
-                <div className="absolute -top-2 -right-2 w-4 h-4 bg-warning-foreground/20 rounded-full animate-ping" />
-              </div>
-            </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Activity className="w-5 h-5" />
+              <span>Quick Actions</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button 
+              onClick={() => setSelectedSection("unlock-frp")} 
+              className="w-full justify-start bg-gradient-primary hover:bg-gradient-primary/90"
+            >
+              <Smartphone className="w-4 h-4 mr-2" />
+              Start New FRP Unlock
+            </Button>
+            <Button 
+              onClick={() => setSelectedSection("check-icloud")} 
+              variant="outline" 
+              className="w-full justify-start"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Check Device Status
+            </Button>
+            <Button 
+              onClick={() => setSelectedSection("add-fund")} 
+              variant="outline" 
+              className="w-full justify-start"
+            >
+              <DollarSign className="w-4 h-4 mr-2" />
+              Add Funds
+            </Button>
           </CardContent>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-warning-foreground/10 rounded-full blur-3xl" />
         </Card>
       </div>
 
-      {/* Order History Table */}
-      <Card className="fade-in">
-        <CardHeader className="border-b border-border/50">
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Clock className="w-5 h-5 text-primary" />
-            <span>Recent Orders</span>
+            <Clock className="w-5 h-5" />
+            <span>Recent Activity</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold">Order ID</TableHead>
-                <TableHead className="font-semibold">Service</TableHead>
-                <TableHead className="font-semibold">IMEI</TableHead>
-                <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold">Reply In</TableHead>
-                <TableHead className="font-semibold">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.length > 0 ? (
-                orders.slice(0, 5).map((order) => (
-                  <TableRow key={order.id} className="hover:bg-muted/30">
-                    <TableCell className="font-mono text-sm">{order.id}</TableCell>
-                    <TableCell className="font-medium">{order.service}</TableCell>
-                    <TableCell className="font-mono text-sm">{order.imei}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          order.status === 'completed' ? 'default' :
-                          order.status === 'failed' ? 'destructive' : 'secondary'
-                        }
-                        className={order.status === 'completed' ? 'bg-success text-success-foreground' : ''}
-                      >
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        {order.status === 'processing' && (
-                          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                        )}
-                        <span className="text-sm">{order.replyIn}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{order.date}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow className="hover:bg-muted/30">
-                  <TableCell colSpan={6} className="h-32 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-2">
-                      <Clock className="w-8 h-8 text-muted-foreground/50" />
-                      <p className="text-muted-foreground">No order history yet</p>
-                      <p className="text-sm text-muted-foreground/70">Start by creating your first unlock order</p>
+        <CardContent>
+          {orders.length > 0 ? (
+            <div className="space-y-3">
+              {orders.slice(0, 5).map((order) => (
+                <div key={order.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Smartphone className="w-4 h-4 text-primary" />
                     </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    <div>
+                      <p className="text-sm font-medium">{order.service}</p>
+                      <p className="text-xs text-muted-foreground">IMEI: {order.imei}</p>
+                    </div>
+                  </div>
+                  <Badge variant={order.status === "completed" ? "secondary" : "outline"}>
+                    {order.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Clock className="w-12 h-12 text-muted-foreground/50 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No recent activity</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </>
   );
 
-  return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar selectedSection={selectedSection} onSectionChange={setSelectedSection} />
-      
-      <main className="flex-1 p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+  function renderContent() {
+    switch (selectedSection) {
+      case "unlock-frp":
+        return <UnlockFRP />;
+      case "history":
+        return <OrderHistory />;
+      case "check-icloud":
+        return <CheckiCloud />;
+      case "check-samsung-kg":
+        return <CheckSamsungKG />;
+      case "check-samsung-info":
+        return <CheckSamsungInfo />;
+      case "check-micloud":
+        return <CheckMiCloud />;
+      case "invoice":
+        return <InvoiceHistory />;
+      case "statement":
+        return <InvoiceHistory />;
+      case "add-fund":
+        return <AddFunds />;
+      case "unsupported":
+        return <UnsupportedModels />;
+      case "contact":
+        return renderContact();
+      case "channel":
+        return renderChannel();
+      default:
+        return renderDashboard();
+    }
+  }
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Mobile Header */}
+        <div className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-3">
-              <Avatar className="w-12 h-12">
-                <AvatarFallback>
-                  <Smartphone className="w-6 h-6" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-2xl font-bold">
-                  {selectedSection === "dashboard" ? "DASHBOARD" : 
-                   selectedSection === "unlock-frp" ? "UNLOCK FRP" :
-                   selectedSection === "history" ? "ORDER HISTORY" :
-                   selectedSection === "add-fund" ? "ADD FUNDS" :
-                   selectedSection === "check-icloud" ? "CHECK ICLOUD" :
-                   selectedSection === "check-samsung-kg" ? "SAMSUNG KG CHECK" :
-                   selectedSection === "check-samsung-info" ? "SAMSUNG INFO" :
-                   selectedSection === "check-micloud" ? "MICLOUD CHECK" :
-                   selectedSection === "invoice" ? "INVOICE HISTORY" :
-                   selectedSection === "statement" ? "ACCOUNT STATEMENT" :
-                   selectedSection === "unsupported" ? "UNSUPPORTED MODELS" :
-                   selectedSection === "contact" ? "CONTACT SUPPORT" :
-                   selectedSection === "channel" ? "CHANNELS" :
-                   selectedSection.toUpperCase().replace("-", " ")}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  rd910 • Balance: ${userStats.balance.toFixed(2)}
-                </p>
+              <MobileSidebar 
+                selectedSection={selectedSection} 
+                onSectionChange={setSelectedSection} 
+              />
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 bg-gradient-primary rounded-md flex items-center justify-center">
+                  <Smartphone className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="font-bold text-sm bg-gradient-primary bg-clip-text text-transparent">
+                  frpIMEI.com
+                </span>
               </div>
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            <Button variant="outline" size="icon">
-              <Settings className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
+              <Badge variant="secondary" className="font-mono text-xs">
+                ${userStats.balance.toFixed(2)}
+              </Badge>
+            </div>
           </div>
         </div>
 
-        {renderContent()}
-      </main>
-    </div>
+        {/* Mobile Content */}
+        <div className="p-4 space-y-4">
+          <div className="space-y-1">
+            <h1 className="text-xl font-bold tracking-tight">
+              {getSectionTitle(selectedSection)}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {getSectionDescription(selectedSection)}
+            </p>
+          </div>
+          
+          {/* Mobile Content Rendering */}
+          {renderContent()}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout
+  return (
+    <SidebarProvider defaultOpen>
+      <div className="min-h-screen w-full flex bg-background">
+        <AppSidebar 
+          selectedSection={selectedSection} 
+          onSectionChange={setSelectedSection} 
+        />
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Desktop Header */}
+          <div className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center space-x-4">
+                <SidebarTrigger />
+                <div>
+                  <h1 className="text-2xl font-bold tracking-tight">
+                    {getSectionTitle(selectedSection)}
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    {getSectionDescription(selectedSection)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <ThemeToggle />
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">Balance:</span>
+                  <Badge variant="secondary" className="font-mono">
+                    ${userStats.balance.toFixed(2)}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Content */}
+          <main className="flex-1 overflow-auto p-6">
+            {renderContent()}
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };

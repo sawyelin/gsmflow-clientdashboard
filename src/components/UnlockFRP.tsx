@@ -119,7 +119,7 @@ export const UnlockFRP = ({ onOrderCreated }: UnlockFRPProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Order Form */}
         <div className="lg:col-span-2">
           <Card>

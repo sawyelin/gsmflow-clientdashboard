@@ -89,7 +89,7 @@ export const CheckSamsungKG = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Check Form */}
         <Card>
           <CardHeader>
@@ -217,7 +217,7 @@ export const CheckSamsungKG = () => {
           <CardTitle>About Knox Guard</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
             <div className="space-y-3">
               <h4 className="font-semibold flex items-center space-x-2">
                 <CheckCircle2 className="w-4 h-4 text-success" />
