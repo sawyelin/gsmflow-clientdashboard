@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { History, Search, Download, Eye, RefreshCw } from "lucide-react";
-import { useGSMServices, Order } from "@/hooks/useGSMServices";
+import { useGSMServices } from "@/hooks/useGSMServices";
+import { Order } from "@/types";
 
 export const OrderHistory = () => {
   const { orders } = useGSMServices();

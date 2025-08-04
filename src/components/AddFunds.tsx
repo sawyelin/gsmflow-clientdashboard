@@ -20,28 +20,14 @@ export const AddFunds = () => {
   const handleAddFunds = async (amount: number) => {
     setIsProcessing(true);
     
-    try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      addFunds(amount);
-      
-      toast({
-        title: "Funds Added Successfully",
-        description: `$${amount.toFixed(2)} has been added to your account. New balance: $${(stats.balance + amount).toFixed(2)}`,
-      });
-
+    const success = await addFunds(amount);
+    
+    if (success) {
       setCustomAmount("");
       setSelectedAmount(null);
-    } catch (error) {
-      toast({
-        title: "Payment Failed",
-        description: "There was an error processing your payment. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
     }
+    
+    setIsProcessing(false);
   };
 
   const finalAmount = selectedAmount || parseFloat(customAmount) || 0;

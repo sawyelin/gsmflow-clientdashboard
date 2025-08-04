@@ -87,16 +87,13 @@ export const UnlockFRP = ({ onOrderCreated }: UnlockFRPProps) => {
     setIsProcessing(true);
     
     try {
-      const order = addOrder(service.name, imei);
+      const order = await addOrder(service.name, imei);
       
-      toast({
-        title: "Order Created Successfully",
-        description: `Order ${order.id} has been submitted. Expected completion: ${service.time}`,
-      });
-
-      setImei("");
-      setSelectedService("");
-      onOrderCreated?.();
+      if (order) {
+        setImei("");
+        setSelectedService("");
+        onOrderCreated?.();
+      }
     } catch (error) {
       toast({
         title: "Order Failed",

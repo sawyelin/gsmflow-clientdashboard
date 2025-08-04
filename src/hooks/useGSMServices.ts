@@ -1,22 +1,7 @@
-import { useState, useEffect } from 'react';
-
-export interface Order {
-  id: string;
-  service: string;
-  imei: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  date: string;
-  replyIn: string;
-  price: number;
-}
-
-export interface UserStats {
-  verification: number;
-  success: number;
-  rejected: number;
-  lastOrder: number;
-  balance: number;
-}
+import { useState, useEffect, useCallback } from 'react';
+import { apiService } from '@/services/api';
+import { Order, UserStats, ServerStatus } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 export const useGSMServices = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -27,118 +12,168 @@ export const useGSMServices = () => {
     lastOrder: 0,
     balance: 150.75
   });
-  const [isServerOnline, setIsServerOnline] = useState(true);
+  const [serverStatus, setServerStatus] = useState<ServerStatus>({
+    online: true,
+    lastChecked: new Date().toISOString()
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  // Simulate some initial orders
-  useEffect(() => {
-    const initialOrders: Order[] = [
-      {
-        id: 'ORD-2024-001',
-        service: 'Samsung FRP Unlock',
-        imei: '356938035643809',
-        status: 'completed',
-        date: '2024-01-15 14:30',
-        replyIn: 'Completed',
-        price: 25.00
-      },
-      {
-        id: 'ORD-2024-002', 
-        service: 'iPhone iCloud Check',
-        imei: '358240051111110',
-        status: 'processing',
-        date: '2024-01-16 09:15',
-        replyIn: '2-4 hours',
-        price: 15.00
-      },
-      {
-        id: 'ORD-2024-003',
-        service: 'Xiaomi Mi Account Check',
-        imei: '867104034567890',
-        status: 'pending',
-        date: '2024-01-16 16:45',
-        replyIn: '1-2 hours',
-        price: 10.00
+  // Load initial data
+  const loadInitialData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [ordersResponse, statsResponse, statusResponse] = await Promise.all([
+        apiService.getOrders(),
+        apiService.getUserStats(),
+        apiService.getServerStatus()
+      ]);
+
+      if (ordersResponse.success && ordersResponse.data) {
+        setOrders(ordersResponse.data);
       }
-    ];
-    
-    setOrders(initialOrders);
-    
-    // Calculate stats from orders
-    const completed = initialOrders.filter(o => o.status === 'completed').length;
-    const failed = initialOrders.filter(o => o.status === 'failed').length;
-    const processing = initialOrders.filter(o => o.status === 'processing' || o.status === 'pending').length;
-    
-    setStats(prev => ({
-      ...prev,
-      verification: processing,
-      success: completed,
-      rejected: failed,
-      lastOrder: initialOrders.length
-    }));
 
-    // Simulate server status changes
-    const serverInterval = setInterval(() => {
-      setIsServerOnline(Math.random() > 0.2); // 80% uptime
+      if (statsResponse.success && statsResponse.data) {
+        setStats(statsResponse.data);
+      }
+
+      if (statusResponse.success && statusResponse.data) {
+        setServerStatus(statusResponse.data);
+      }
+    } catch (error) {
+      console.error('Failed to load initial data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load data. Please refresh the page.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadInitialData();
+    
+    // Check server status periodically
+    const statusInterval = setInterval(async () => {
+      try {
+        const response = await apiService.getServerStatus();
+        if (response.success && response.data) {
+          setServerStatus(response.data);
+        }
+      } catch (error) {
+        console.error('Server status check failed:', error);
+      }
     }, 30000);
 
-    return () => clearInterval(serverInterval);
+    return () => clearInterval(statusInterval);
+  }, [loadInitialData]);
+
+  const addOrder = useCallback(async (service: string, imei: string): Promise<Order | null> => {
+    try {
+      const response = await apiService.createOrder(service, imei);
+      
+      if (response.success && response.data) {
+        const newOrder = response.data;
+        
+        setOrders(prev => [newOrder, ...prev]);
+        setStats(prev => ({
+          ...prev,
+          verification: prev.verification + 1,
+          lastOrder: prev.lastOrder + 1,
+          balance: prev.balance - newOrder.price
+        }));
+
+        toast({
+          title: "Order Created",
+          description: `Order ${newOrder.id} has been created successfully.`
+        });
+
+        // Simulate order status updates
+        setTimeout(() => {
+          setOrders(prev => prev.map(order => 
+            order.id === newOrder.id 
+              ? { ...order, status: 'processing', replyIn: '30 min - 2 hours' }
+              : order
+          ));
+        }, 5000);
+
+        return newOrder;
+      } else {
+        toast({
+          title: "Order Failed",
+          description: response.error || "Failed to create order",
+          variant: "destructive"
+        });
+        return null;
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Network error. Please try again.",
+        variant: "destructive"
+      });
+      return null;
+    }
+  }, [toast]);
+
+  const addFunds = useCallback(async (amount: number): Promise<boolean> => {
+    try {
+      const response = await apiService.addFunds(amount);
+      
+      if (response.success && response.data) {
+        setStats(prev => ({
+          ...prev,
+          balance: response.data!.newBalance
+        }));
+
+        toast({
+          title: "Funds Added",
+          description: `$${amount.toFixed(2)} has been added to your account.`
+        });
+
+        return true;
+      } else {
+        toast({
+          title: "Payment Failed",
+          description: response.error || "Failed to add funds",
+          variant: "destructive"
+        });
+        return false;
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Payment processing failed. Please try again.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  }, [toast]);
+
+  const getServicePrice = useCallback((service: string): number => {
+    return apiService.getServicePrice(service);
   }, []);
 
-  const addOrder = (service: string, imei: string) => {
-    const newOrder: Order = {
-      id: `ORD-2024-${String(orders.length + 1).padStart(3, '0')}`,
-      service,
-      imei,
-      status: 'pending',
-      date: new Date().toLocaleString(),
-      replyIn: '1-3 hours',
-      price: getServicePrice(service)
-    };
+  const getAvailableServices = useCallback(() => {
+    return apiService.getAvailableServices();
+  }, []);
 
-    setOrders(prev => [newOrder, ...prev]);
-    setStats(prev => ({
-      ...prev,
-      verification: prev.verification + 1,
-      lastOrder: prev.lastOrder + 1,
-      balance: prev.balance - newOrder.price
-    }));
-
-    // Simulate order processing
-    setTimeout(() => {
-      setOrders(prev => prev.map(order => 
-        order.id === newOrder.id 
-          ? { ...order, status: 'processing', replyIn: '30 min - 2 hours' }
-          : order
-      ));
-    }, 5000);
-
-    return newOrder;
-  };
-
-  const getServicePrice = (service: string): number => {
-    const prices: Record<string, number> = {
-      'Samsung FRP Unlock': 25.00,
-      'iPhone iCloud Check': 15.00,
-      'Xiaomi Mi Account Check': 10.00,
-      'Samsung KG Check': 20.00,
-      'Samsung Info Check': 12.00
-    };
-    return prices[service] || 15.00;
-  };
-
-  const addFunds = (amount: number) => {
-    setStats(prev => ({
-      ...prev,
-      balance: prev.balance + amount
-    }));
-  };
+  const refreshData = useCallback(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   return {
     orders,
     stats,
-    isServerOnline,
+    serverStatus,
+    isServerOnline: serverStatus.online,
+    isLoading,
     addOrder,
     addFunds,
-    getServicePrice
+    getServicePrice,
+    getAvailableServices,
+    refreshData
   };
 };
