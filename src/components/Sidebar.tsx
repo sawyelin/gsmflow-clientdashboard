@@ -27,7 +27,8 @@ import {
   AlertTriangle,
   MessageCircle,
   Radio,
-  Menu
+  Menu,
+  LayoutDashboard
 } from "lucide-react";
 
 interface AppSidebarProps {
@@ -36,6 +37,12 @@ interface AppSidebarProps {
 }
 
 const menuSections = [
+  {
+    title: "OVERVIEW",
+    items: [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard }
+    ]
+  },
   {
     title: "ORDER",
     items: [

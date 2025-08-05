@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 
 export const Dashboard = () => {
-  const [selectedSection, setSelectedSection] = useState("unlock-frp");
+  const [selectedSection, setSelectedSection] = useState("dashboard");
   const { addFunds, orders, stats: userStats, isLoading } = useGSMServices();
   const isMobile = useIsMobile();
 
