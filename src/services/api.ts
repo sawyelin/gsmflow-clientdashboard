@@ -1,10 +1,15 @@
 import { Order, UserStats, CheckResult, Invoice, ApiResponse, ServerStatus } from '@/types';
 
-// API Configuration
+// API Configuration - Ready for production
 const API_CONFIG = {
-  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseUrl: import.meta.env.VITE_API_URL || 'https://your-domain.com/api',
   timeout: 30000,
   retries: 3,
+  // Add authentication headers when ready
+  getHeaders: () => ({
+    'Content-Type': 'application/json',
+    // 'Authorization': `Bearer ${getAuthToken()}`, // Uncomment when implementing auth
+  }),
 };
 
 // Mock data - Replace with real API calls

@@ -16,6 +16,11 @@ export interface UserStats {
   rejected: number;
   lastOrder: number;
   balance: number;
+  // Backend integration ready fields
+  responseTime?: number;
+  systemLoad?: number;
+  totalOrders?: number;
+  successRate?: number;
 }
 
 export interface CheckResult {

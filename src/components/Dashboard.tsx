@@ -185,11 +185,11 @@ export const Dashboard = () => {
   );
 
   const renderDashboard = () => (
-    <>
+    <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {dashboardStats.map((stat, index) => (
-          <Card key={index} className="relative overflow-hidden hover-scale fade-in hover-glow">
+          <Card key={index} className="relative overflow-hidden hover-scale fade-in border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
               <stat.icon className="h-4 w-4 text-muted-foreground" />
@@ -203,12 +203,12 @@ export const Dashboard = () => {
         ))}
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Server Status & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+        <Card className="border-border">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center space-x-2">
               <Server className="w-5 h-5" />
               <span>Server Status</span>
@@ -231,20 +231,20 @@ export const Dashboard = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm">Response Time</span>
-              <Badge variant="secondary">~45ms</Badge>
+              <Badge variant="secondary">~{userStats?.responseTime || 45}ms</Badge>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>System Load</span>
-                <span>34%</span>
+                <span>{userStats?.systemLoad || 34}%</span>
               </div>
-              <Progress value={34} className="h-2" />
+              <Progress value={userStats?.systemLoad || 34} className="h-2" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="border-border">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center space-x-2">
               <Activity className="w-5 h-5" />
               <span>Quick Actions</span>
@@ -279,8 +279,8 @@ export const Dashboard = () => {
       </div>
 
       {/* Recent Activity */}
-      <Card>
-        <CardHeader>
+      <Card className="border-border">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center space-x-2">
             <Clock className="w-5 h-5" />
             <span>Recent Activity</span>
@@ -290,7 +290,7 @@ export const Dashboard = () => {
           {orders.length > 0 ? (
             <div className="space-y-3">
               {orders.slice(0, 5).map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                <div key={order.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                       <Smartphone className="w-4 h-4 text-primary" />
@@ -314,7 +314,7 @@ export const Dashboard = () => {
           )}
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 
   function renderContent() {
