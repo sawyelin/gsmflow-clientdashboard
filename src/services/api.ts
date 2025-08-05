@@ -2,7 +2,7 @@ import { Order, UserStats, CheckResult, Invoice, ApiResponse, ServerStatus } fro
 
 // API Configuration
 const API_CONFIG = {
-  baseUrl: process.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
   timeout: 30000,
   retries: 3,
 };
